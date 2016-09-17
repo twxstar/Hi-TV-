@@ -12,14 +12,16 @@ let kPageTitleViewH: CGFloat = 44;
 
 class JCHomeController: UIViewController {
     // 懒加载滚动条
-    private lazy var pageTitleView: JCPageTitleView = {
+    private lazy var pageTitleView: JCPageTitleView = { [weak self] in
         let frame = CGRect(x: 0, y: kStatusBarH + kNavBarH, width: JC_SCREEN_WIDTH, height: kPageTitleViewH)
         let titlesArray: [String] = ["推荐", "游戏", "娱乐", "趣玩"];
         let titleView = JCPageTitleView(frame: frame, titlesArray: titlesArray)
+        titleView.delegate = self
         
         return titleView
     }()
-    private lazy var pageContentView: JCPageContentView = {
+    // 滚动内容
+    private lazy var pageContentView: JCPageContentView = { [weak self] in
         let contentY: CGFloat = kStatusBarH + kNavBarH + kPageTitleViewH;
         let contentH: CGFloat = JC_SCREEN_HEIGHT - (kStatusBarH + kNavBarH + kPageTitleViewH + kTabBarH)
         let frame = CGRect(x: 0, y:contentY , width: JC_SCREEN_WIDTH, height: contentH) 
@@ -32,7 +34,7 @@ class JCHomeController: UIViewController {
             childVCs.append(vc)
         }
         
-        let pageContentView = JCPageContentView(frame: frame, childVCs: childVCs, fatherVC: self)
+        let pageContentView = JCPageContentView(frame: frame, childVCs: childVCs, fatherVC: self!)
         
         return pageContentView
     }()
@@ -70,5 +72,11 @@ extension JCHomeController {
         let qrcodeItem = UIBarButtonItem(imageNamed: "Image_scan", highImageNamed: "Image_scan_click", size: size)
         navigationItem.rightBarButtonItems = [historyItem, searchItem, qrcodeItem]
     }
+}
 
+// MARK: - JCPageTitleViewDelegate
+extension JCHomeController: JCPageTitleViewDelegate {
+    func pageTitleView(titleView: JCPageTitleView, selectedIndex: Int) {
+        pageContentView.setCurrentIndex(selectedIndex) 
+    }
 }

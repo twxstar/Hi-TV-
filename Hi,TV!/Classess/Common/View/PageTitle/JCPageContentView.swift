@@ -89,3 +89,10 @@ extension JCPageContentView: UICollectionViewDataSource {
 extension JCPageContentView: UICollectionViewDelegate {
     
 }
+
+// MARK:- 对外暴露的方法
+extension JCPageContentView {
+    func setCurrentIndex(index: Int) {
+        collectionView.setContentOffset(CGPoint(x: CGFloat(index) * JC_SCREEN_WIDTH, y: 0), animated: false)
+    }
+}

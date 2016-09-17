@@ -8,10 +8,15 @@
 
 import UIKit
 
-/// MARK: 协议
+// MARK: 代理协议
 //Protocol JCPageTitleViewDelegate: class {
-//    func pageTitleView(titleView : JCPageTitleView, selectedIndex index : Int)
+//    func pageTitleView(titleView : JCPageTitleView, selectedIndex : Int)
 //}
+
+protocol JCPageTitleViewDelegate: class {
+    // 点击titleLabel
+    func pageTitleView(titleView : JCPageTitleView, selectedIndex : Int)
+}
 
 let kScrollViewLineH: CGFloat = 2
 
@@ -26,7 +31,7 @@ class JCPageTitleView: UIView {
         let scrollView = UIScrollView()
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.scrollsToTop = false
-//        scrollView.bounces = false
+        scrollView.bounces = false
         
         return scrollView
     }()
@@ -38,6 +43,8 @@ class JCPageTitleView: UIView {
         scrollLine.backgroundColor = JC_TINT_COLOR
         return scrollLine
         }()
+    // 代理
+    weak var delegate: JCPageTitleViewDelegate?
     
     init(frame: CGRect, titlesArray: [String]) {
         self.titlesArray = titlesArray;
@@ -89,7 +96,12 @@ extension JCPageTitleView {
             
             scrollView.addSubview(label)
             
+            //
             titleLabels.append(label)
+            
+            // label添加手势
+            label.userInteractionEnabled = true
+            label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "titleLabelTap:"))
         }
     }
     
@@ -112,6 +124,35 @@ extension JCPageTitleView {
         // 2.2.设置scrollLine的属性
         scrollView.addSubview(scrollLine)
         scrollLine.frame = CGRect(x: firstLabel.frame.origin.x, y: frame.height - kScrollViewLineH, width: firstLabel.frame.width, height: kScrollViewLineH)
+        
+    }
+}
 
+// MARK: - 监听label点击
+extension JCPageTitleView {
+    @objc private func titleLabelTap(tapGes: UITapGestureRecognizer) {
+        // 1.获取当前Label
+        guard let currentLabel = tapGes.view as? UILabel else {
+            return;
+        }
+        
+        // 2.获取之前的Label
+        let previousLabel = titleLabels[currentIndex]
+        
+        // 3.切换文字的颜色
+        currentLabel.textColor = JC_TINT_COLOR
+        previousLabel.textColor = UIColor.lightGrayColor()
+        
+        // 4.保存最新Label的下标值
+        currentIndex = currentLabel.tag
+        
+        // 5.滚动条位置发生改变
+        let scrollLineX = CGFloat(currentIndex) * scrollLine.frame.width
+        UIView.animateWithDuration(0.15) { () -> Void in
+            self.scrollLine.frame.origin.x = scrollLineX
+        }
+        
+        // 通知代理
+        delegate?.pageTitleView(self, selectedIndex: currentIndex)
     }
 }
