@@ -107,7 +107,6 @@ extension JCPageTitleView {
             return
         }
         
-//        firstLabel.textColor = UIColor(r: kSelectColor.0, g: kSelectColor.1, b: kSelectColor.2)
         firstLabel.textColor = JC_TINT_COLOR
         
         // 2.2.设置scrollLine的属性

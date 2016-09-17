@@ -22,6 +22,7 @@ class JCMainTabBarController: UITabBarController {
     }
 
     // MARK: - 内部控制方法
+    // 添加子控制器
     func jc_addChildViewController(childController: UIViewController, itemImageNamed: String, itemTitle: String) {
  
         childController.tabBarItem.image = UIImage(named: itemImageNamed + "_normal")
@@ -35,6 +36,5 @@ class JCMainTabBarController: UITabBarController {
         
         addChildViewController(mainNavigationController)
     }
-    
 
 }
