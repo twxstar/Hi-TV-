@@ -36,6 +36,8 @@ class JCHomeController: UIViewController {
         
         let pageContentView = JCPageContentView(frame: frame, childVCs: childVCs, fatherVC: self!)
         
+        pageContentView.delegate = self
+        
         return pageContentView
     }()
 
@@ -78,5 +80,12 @@ extension JCHomeController {
 extension JCHomeController: JCPageTitleViewDelegate {
     func pageTitleView(titleView: JCPageTitleView, selectedIndex: Int) {
         pageContentView.setCurrentIndex(selectedIndex) 
+    }
+}
+
+// MARK: - JCPageContentViewDelegate
+extension JCHomeController: JCPageContentViewDelegate {
+    func pageContentView(contentView: JCPageContentView, progress: CGFloat, sourceIndex: Int, targetIndex: Int) {
+        pageTitleView.setTitleWithProgress(progress, sourceIndex: sourceIndex, targetIndex: targetIndex)
     }
 }

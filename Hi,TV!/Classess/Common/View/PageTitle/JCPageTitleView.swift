@@ -8,17 +8,17 @@
 
 import UIKit
 
-// MARK: 代理协议
-//Protocol JCPageTitleViewDelegate: class {
-//    func pageTitleView(titleView : JCPageTitleView, selectedIndex : Int)
-//}
 
+let kScrollViewLineH: CGFloat = 2
+let kNormaleColor: (CGFloat, CGFloat, CGFloat) = (170, 170, 170)
+let kSeletedColor: (CGFloat, CGFloat, CGFloat) = (246, 90, 27)
+
+
+//  MARK: 代理协议 
 protocol JCPageTitleViewDelegate: class {
     // 点击titleLabel
     func pageTitleView(titleView : JCPageTitleView, selectedIndex : Int)
 }
-
-let kScrollViewLineH: CGFloat = 2
 
 class JCPageTitleView: UIView {
 
@@ -86,7 +86,7 @@ extension JCPageTitleView {
             label.text = title
             label.tag = index
             label.font = UIFont.systemFontOfSize(16)
-            label.textColor = UIColor.lightGrayColor()
+            label.textColor = JC_COLOR(kNormaleColor.0, g: kNormaleColor.1, b: kNormaleColor.2, a: 1.0)
             label.textAlignment = .Center
             
             // 
@@ -108,7 +108,7 @@ extension JCPageTitleView {
     private func setupBottomLineAndScrollLine() {
         // 1.添加底线
         let bottomLine = UIView()
-        bottomLine.backgroundColor = UIColor.lightGrayColor()
+        bottomLine.backgroundColor = JC_COLOR(kNormaleColor.0, g: kNormaleColor.1, b: kNormaleColor.2, a: 1.0)
         let lineH : CGFloat = 0.5
         bottomLine.frame = CGRect(x: 0, y: frame.height - lineH, width: frame.width, height: lineH)
         addSubview(bottomLine)
@@ -141,7 +141,7 @@ extension JCPageTitleView {
         
         // 3.切换文字的颜色
         currentLabel.textColor = JC_TINT_COLOR
-        previousLabel.textColor = UIColor.lightGrayColor()
+        previousLabel.textColor = JC_COLOR(kNormaleColor.0, g: kNormaleColor.1, b: kNormaleColor.2, a: 1.0)
         
         // 4.保存最新Label的下标值
         currentIndex = currentLabel.tag
@@ -155,4 +155,39 @@ extension JCPageTitleView {
         // 通知代理
         delegate?.pageTitleView(self, selectedIndex: currentIndex)
     }
+}
+
+// MARK: - Pubclic Func
+extension JCPageTitleView {
+    func setTitleWithProgress(progress : CGFloat, sourceIndex : Int, targetIndex : Int) {
+        // 1.取出sourceLabel/targetLabel
+        let sourceLabel = titleLabels[sourceIndex]
+        let targetLabel = titleLabels[targetIndex]
+        
+        // 2.处理滑块的逻辑
+        let moveX = (targetLabel.frame.origin.x - sourceLabel.frame.origin.x) * progress
+        scrollLine.frame.origin.x = sourceLabel.frame.origin.x + moveX
+        
+        // 3.颜色的渐变(复杂)
+        // 3.1.取出变化的范围
+        let colorDelta = (kSeletedColor.0 - kNormaleColor.0,
+                          kSeletedColor.1 - kNormaleColor.1,
+                          kSeletedColor.2 - kNormaleColor.2)
+        
+        // 3.2.变化sourceLabel
+        sourceLabel.textColor = JC_COLOR(kSeletedColor.0 - colorDelta.0 * progress,
+                                         g: kSeletedColor.1 - colorDelta.1 * progress,
+                                         b: kSeletedColor.2 - colorDelta.2 * progress,
+                                         a: 1.0)
+        
+        // 3.2.变化targetLabel
+        targetLabel.textColor = JC_COLOR(kNormaleColor.0 + colorDelta.0 * progress,
+                                         g: kNormaleColor.1 + colorDelta.1 * progress,
+                                         b: kNormaleColor.2 + colorDelta.2 * progress,
+                                         a: 1.0)
+        
+        // 4.记录最新的index
+        currentIndex = targetIndex
+    }
+
 }
